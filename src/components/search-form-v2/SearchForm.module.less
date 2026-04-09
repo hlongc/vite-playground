@@ -1,0 +1,57 @@
+.root {
+  width: 100%;
+}
+
+.container {
+  width: 100%;
+}
+
+.buttonCell {
+  display: block;
+  justify-self: flex-end;
+  grid-column-start: -2;
+}
+
+.buttonInner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.expandButton {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.expandIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-size: 16px;
+  transform: scale(0.75, 0.5);
+  transition: transform 0.2s linear;
+}
+
+.expandButtonExpanded .expandIcon {
+  transform: scale(0.75, 0.5) rotate(-180deg);
+}
+
+.collapsedItemHidden {
+  display: none !important;
+}
+
+.layoutCard {
+  margin-bottom: 12px;
+}
+
+.settingTrigger {
+  padding: 0;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.settingText {
+  font-size: 14px;
+}

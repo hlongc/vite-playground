@@ -1,0 +1,43 @@
+.grid {
+  display: grid;
+  min-width: 1px;
+}
+
+.itemHidden {
+  display: none;
+}
+
+.item :global(.ant-form-item) {
+  margin: 0;
+}
+
+.item :global(.ant-form-item-row) {
+  flex-wrap: nowrap;
+}
+
+.item :global(.ant-form-item-label) {
+  display: flex;
+  overflow: unset;
+}
+
+.item :global(.ant-form-item-label > label) {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.item
+  :global(.ant-form-item-label > label:not(.ant-form-item-required))
+  .labelText {
+  max-width: calc(100% - 12px);
+}
+
+.labelText {
+  display: -webkit-box;
+  overflow: hidden;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
