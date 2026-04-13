@@ -22,8 +22,17 @@ const defaultLayoutConfig: Required<FieldGridLayoutConfig> = {
   minColumnWidth: 340,
   columnGap: 24,
   rowGap: 12,
+  maxColumns: Number.POSITIVE_INFINITY,
 };
 const resizeThreshold = 10;
+
+function normalizeMaxColumns(maxColumns: number) {
+  if (!Number.isFinite(maxColumns)) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  return Math.max(Math.floor(maxColumns), 1);
+}
 
 /**
  * useFieldGrid 负责把“声明式的表单项配置”转换成“可以直接渲染到 CSS Grid 里的布局数据”。
@@ -52,6 +61,7 @@ export default function useFieldGrid(props: UseFieldGridProps) {
     [layoutConfig]
   );
   const { minColumnWidth, columnGap, rowGap } = mergedLayoutConfig;
+  const maxColumns = normalizeMaxColumns(mergedLayoutConfig.maxColumns);
 
   const prevContainerWidth = useRef(0);
   const [rowNum, setRowNum] = useState(0);
@@ -75,16 +85,17 @@ export default function useFieldGrid(props: UseFieldGridProps) {
        * 反复触发微小尺寸变化，导致 rowNum 高频重算。
        */
       if (previous === 0 || diffContainerWidth >= resizeThreshold) {
-        const next = Math.floor(
+        const autoColumnCount = Math.floor(
           (containerWidth - minColumnWidth) / (minColumnWidth + columnGap) + 1
         );
+        const next = Math.min(autoColumnCount, maxColumns);
         prevContainerWidth.current = containerWidth;
         return Math.max(next, 1);
       }
 
       return previous;
     });
-  }, [columnGap, containerRef, minColumnWidth]);
+  }, [columnGap, containerRef, maxColumns, minColumnWidth]);
 
   useEffect(() => {
     // 首次挂载先主动算一次，避免必须等 ResizeObserver 回调后才有布局。

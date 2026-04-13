@@ -11,7 +11,8 @@ export default function FieldGridPage() {
       <Card className={styles.tipCard}>
         <Paragraph>
           这页单独验证 `field-grid-v2` 的布局算法，包括 `colSpan`、`colStart`
-          和整行占满的能力。这里额外传了 `layoutConfig`，方便直接观察密度调整后的效果。
+          和整行占满的能力。这里额外传了 `layoutConfig.maxColumns=3`，
+          方便观察“最多 3 列，但窄容器仍然自动降列”的效果。
         </Paragraph>
       </Card>
 
@@ -23,6 +24,7 @@ export default function FieldGridPage() {
               minColumnWidth: 260,
               columnGap: 16,
               rowGap: 16,
+              maxColumns: 3,
             }}
             items={[
               {

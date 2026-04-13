@@ -27,6 +27,7 @@ export interface FieldGridLayoutConfig {
   minColumnWidth?: number;
   columnGap?: number;
   rowGap?: number;
+  maxColumns?: number;
 }
 
 export interface UseFieldGridProps

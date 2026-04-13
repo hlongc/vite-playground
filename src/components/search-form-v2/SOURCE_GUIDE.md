@@ -133,6 +133,13 @@
 - `minColumnWidth`
 - `columnGap`
 - `rowGap`
+- `maxColumns`
+
+其中 `maxColumns` 是“最多几列”，不是“固定几列”。比如：
+
+- 容器宽度能放 5 列，`maxColumns=3`，最终显示 3 列。
+- 容器宽度只能放 2 列，`maxColumns=3`，最终显示 2 列。
+- 不传 `maxColumns` 时，不限制最大列数，继续保持自动布局。
 
 最终真正应用到 DOM 上的是：
 

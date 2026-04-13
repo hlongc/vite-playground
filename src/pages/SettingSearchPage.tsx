@@ -35,6 +35,7 @@ export default function SettingSearchPage() {
           minColumnWidth: 280,
           columnGap: 16,
           rowGap: 16,
+          maxColumns: 3,
         }}
         collapseConfig={{
           singleColumnExtraRows: 2,
