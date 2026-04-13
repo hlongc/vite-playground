@@ -1,21 +1,15 @@
-import { Form } from 'antd';
-import cs from 'classnames';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import type { CSSProperties, ReactNode } from 'react';
+import { Form } from "antd";
+import cs from "classnames";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
-import styles from './FieldGrid.module.less';
+import styles from "./FieldGrid.module.less";
 import type {
   FieldGridItem,
   FieldGridLayoutConfig,
   FormItemWithGrid,
   UseFieldGridProps,
-} from './interface';
+} from "./interface";
 
 const emptyItems: FieldGridItem[] = [];
 const defaultLayoutConfig: Required<FieldGridLayoutConfig> = {
@@ -58,18 +52,19 @@ export default function useFieldGrid(props: UseFieldGridProps) {
       ...defaultLayoutConfig,
       ...layoutConfig,
     }),
-    [layoutConfig]
+    [layoutConfig],
   );
   const { minColumnWidth, columnGap, rowGap } = mergedLayoutConfig;
   const maxColumns = normalizeMaxColumns(mergedLayoutConfig.maxColumns);
 
   const prevContainerWidth = useRef(0);
+  const resizeFrameRef = useRef<number | null>(null);
   const [rowNum, setRowNum] = useState(0);
 
   const setRowNumHandle = useCallback(() => {
     const containerWidth = containerRef.current?.clientWidth ?? 0;
     const diffContainerWidth = Math.abs(
-      containerWidth - prevContainerWidth.current
+      containerWidth - prevContainerWidth.current,
     );
 
     setRowNum((previous) => {
@@ -86,7 +81,7 @@ export default function useFieldGrid(props: UseFieldGridProps) {
        */
       if (previous === 0 || diffContainerWidth >= resizeThreshold) {
         const autoColumnCount = Math.floor(
-          (containerWidth - minColumnWidth) / (minColumnWidth + columnGap) + 1
+          (containerWidth - minColumnWidth) / (minColumnWidth + columnGap) + 1,
         );
         const next = Math.min(autoColumnCount, maxColumns);
         prevContainerWidth.current = containerWidth;
@@ -97,35 +92,69 @@ export default function useFieldGrid(props: UseFieldGridProps) {
     });
   }, [columnGap, containerRef, maxColumns, minColumnWidth]);
 
+  const scheduleSetRowNumHandle = useCallback(() => {
+    /**
+     * Windows 上点击浏览器右上角“最大化/还原”时，窗口尺寸、滚动条和布局容器
+     * 可能不是在同一个时刻完成更新的。如果 ResizeObserver 回调里马上读
+     * clientWidth，偶尔会读到上一帧的宽度，导致 rowNum 暂时沿用全屏时的列数。
+     *
+     * 这里把测量延后一帧，并且同一帧内只保留最后一次测量：
+     * - 避免 ResizeObserver / window.resize 连续触发造成重复计算。
+     * - 等浏览器完成这次窗口还原后的布局结算，再读取更稳定的容器宽度。
+     */
+    if (typeof window === "undefined") {
+      setRowNumHandle();
+      return;
+    }
+
+    if (resizeFrameRef.current !== null) {
+      window.cancelAnimationFrame(resizeFrameRef.current);
+    }
+
+    resizeFrameRef.current = window.requestAnimationFrame(() => {
+      resizeFrameRef.current = null;
+      setRowNumHandle();
+    });
+  }, [setRowNumHandle]);
+
   useEffect(() => {
     // 首次挂载先主动算一次，避免必须等 ResizeObserver 回调后才有布局。
-    setRowNumHandle();
+    scheduleSetRowNumHandle();
 
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return undefined;
     }
 
-    if (typeof window.ResizeObserver === 'undefined') {
-      // 老环境没有 ResizeObserver 时，退化成 window resize。
-      window.addEventListener('resize', setRowNumHandle);
-      return () => {
-        window.removeEventListener('resize', setRowNumHandle);
-      };
-    }
+    /**
+     * ResizeObserver 负责父容器变化，window.resize 负责浏览器窗口变化。
+     * 两者同时保留是为了覆盖 Win11 外接屏场景下“窗口已经还原，但容器 observer
+     * 没有及时给出可收缩宽度”的情况；最终都会进入同一个 rAF 调度函数。
+     */
+    window.addEventListener("resize", scheduleSetRowNumHandle);
 
-    // 现代浏览器优先监听容器自身尺寸变化，这样父容器伸缩也能及时重排。
-    const observer = new window.ResizeObserver(() => {
-      setRowNumHandle();
-    });
+    let observer: ResizeObserver | undefined;
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+    if (typeof window.ResizeObserver !== "undefined") {
+      // 现代浏览器优先监听容器自身尺寸变化，这样父容器伸缩也能及时重排。
+      observer = new window.ResizeObserver(() => {
+        scheduleSetRowNumHandle();
+      });
+
+      if (containerRef.current) {
+        observer.observe(containerRef.current);
+      }
     }
 
     return () => {
-      observer.disconnect();
+      window.removeEventListener("resize", scheduleSetRowNumHandle);
+      observer?.disconnect();
+
+      if (resizeFrameRef.current !== null) {
+        window.cancelAnimationFrame(resizeFrameRef.current);
+        resizeFrameRef.current = null;
+      }
     };
-  }, [containerRef, setRowNumHandle]);
+  }, [containerRef, scheduleSetRowNumHandle]);
 
   const items = useMemo<FormItemWithGrid[]>(() => {
     const edge = (line: number, isStart: boolean) => {
@@ -188,7 +217,7 @@ export default function useFieldGrid(props: UseFieldGridProps) {
       nextColStart = edge(nextColStart, true);
 
       let nextColEnd = colEnd;
-      if (colSpan === 'max') {
+      if (colSpan === "max") {
         /**
          * colSpan = 'max' 是最特殊的模式，语义是“无论当前列数是多少都铺满整行”。
          * 所以这里直接把 start 固定为 1，end 固定为 rowNum + 1。
@@ -231,10 +260,10 @@ export default function useFieldGrid(props: UseFieldGridProps) {
       }
 
       result.push({
-        labelAlign: labelAlign ?? props.labelAlign ?? 'right',
+        labelAlign: labelAlign ?? props.labelAlign ?? "right",
         labelCol: {
           flex: `0 0 ${
-            typeof labelWidth === 'number' ? `${labelWidth}px` : labelWidth
+            typeof labelWidth === "number" ? `${labelWidth}px` : labelWidth
           }`,
         },
         wrapperCol: {
@@ -309,7 +338,7 @@ export default function useFieldGrid(props: UseFieldGridProps) {
                       {
                         [styles.itemHidden]: item.hidden,
                       },
-                      itemClassName
+                      itemClassName,
                     )}
                     data-row-index={rowIndex}
                     data-col-start={colStart}
@@ -323,8 +352,8 @@ export default function useFieldGrid(props: UseFieldGridProps) {
                       <Form.Item
                         {...formItemProps}
                         label={
-                          typeof formItemProps.label !== 'string' ||
-                          labelWidth === 'auto' ? (
+                          typeof formItemProps.label !== "string" ||
+                          labelWidth === "auto" ? (
                             // labelWidth=auto 时直接交给 antd 自然撑开，不做截断包装。
                             formItemProps.label
                           ) : (
@@ -343,14 +372,14 @@ export default function useFieldGrid(props: UseFieldGridProps) {
                   </div>
                 );
               })}
-              // extra 一般给 SearchFormV2 放按钮区使用，让按钮区和字段一起走同一套网格。
+              {/* extra 一般给 SearchFormV2 放按钮区使用，让按钮区和字段一起走同一套网格。 */}
               {extra}
             </>
           )}
         </div>
       );
     },
-    [columnGap, containerRef, labelWidth, minColumnWidth, rowGap, rowNum]
+    [columnGap, containerRef, labelWidth, minColumnWidth, rowGap, rowNum],
   );
 
   return { rowNum, items, renderGrid };

@@ -30,7 +30,7 @@ export default function BasicSearchPage() {
         onSearch={(value) => setSearchValue(value as Record<string, unknown>)}
         onReset={(value) => setSearchValue(value as Record<string, unknown>)}
         labelWidth={92}
-        requiredFields={['keyword']}
+        requiredFields={["keyword"]}
         items={[
           {
             label: "关键字",
@@ -65,13 +65,17 @@ export default function BasicSearchPage() {
           {
             label: "备注",
             name: "remark",
-            colSpan: "max",
-            value: (
-              <Input.TextArea
-                placeholder="支持整行跨列"
-                autoSize={{ minRows: 2, maxRows: 4 }}
-              />
-            ),
+            value: <Input placeholder="支持整行跨列" />,
+          },
+          {
+            label: "节点",
+            name: "node",
+            value: <Input placeholder="支持整行跨列" />,
+          },
+          {
+            label: "测试",
+            name: "test",
+            value: <Input placeholder="支持整行跨列" />,
           },
         ]}
       />
