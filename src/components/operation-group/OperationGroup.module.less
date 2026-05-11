@@ -1,0 +1,42 @@
+.group {
+  display: inline-flex;
+  min-width: 0;
+}
+
+.moreTrigger {
+  padding-inline: 0 !important;
+}
+
+.moreText {
+  display: inline-flex;
+  align-items: center;
+}
+
+.dropdown {
+  min-width: 160px;
+  padding: 8px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(15, 39, 84, 0.14);
+}
+
+.dropdownList {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.dropdownItem :global(.ant-btn),
+.dropdownItem :global(.ant-dropdown-trigger),
+.dropdownItem > * {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+}

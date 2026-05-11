@@ -1,0 +1,95 @@
+.root {
+  :global(.ant-table-footer) {
+    padding: 0 !important;
+  }
+}
+
+.caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.captionDesc {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  color: #7e8288;
+  font-size: 13px;
+}
+
+.captionDescItem:not(:last-child) {
+  margin-right: 12px;
+}
+
+.captionActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selection {
+  display: flex;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 0 8px 0 14px;
+  background: #fff;
+}
+
+.selectionDesc {
+  display: flex;
+  align-items: center;
+}
+
+.selectionDescPrimary {
+  margin: 0 4px;
+  color: #1677ff;
+  font-weight: 600;
+}
+
+.selectionActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resizableHeaderCell {
+  position: relative;
+}
+
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  right: -6px;
+  z-index: 2;
+  width: 12px;
+  height: 100%;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+
+.resizeHandle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  width: 2px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  transform: translateY(-50%);
+  transition:
+    background-color 0.2s ease,
+    height 0.2s ease,
+    width 0.2s ease;
+}
+
+.resizableHeaderCell:hover .resizeHandle::after {
+  width: 3px;
+  height: 24px;
+  background: rgba(22, 119, 255, 0.78);
+}
