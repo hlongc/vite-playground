@@ -2,14 +2,20 @@ import { Card } from 'antd';
 import { useCallback, useMemo } from 'react';
 
 import ProTable from '../pro-table';
-import type { ObjectType, SearchTableProps } from './interface';
+import type {
+  ObjectType,
+  UseSearchTableProps,
+  UseSearchTableResult,
+} from './interface';
 import usePaginatedSearch from './usePaginatedSearch';
 
 export default function useSearchTable<
   ValueType extends ObjectType,
   Condition = unknown,
   ResExtra = unknown,
->(props: SearchTableProps<ValueType, Condition, ResExtra>) {
+>(
+  props: UseSearchTableProps<ValueType, Condition, ResExtra>
+): UseSearchTableResult<ValueType, ResExtra> {
   const { layout = 'card', ...restProps } = props;
   const {
     requestMethod,
@@ -29,7 +35,6 @@ export default function useSearchTable<
     run,
     refresh,
     mutate,
-    changeCurrent,
     onChange,
     paginationProps,
   } = usePaginatedSearch({
@@ -42,7 +47,7 @@ export default function useSearchTable<
   });
 
   const mergedOnChange = useCallback<
-    NonNullable<SearchTableProps<ValueType, Condition, ResExtra>['onChange']>
+    NonNullable<UseSearchTableProps<ValueType, Condition, ResExtra>['onChange']>
   >(
     (tablePagination, filters, sorter, extra) => {
       onChange(tablePagination, filters, sorter, extra);
@@ -86,15 +91,21 @@ export default function useSearchTable<
     tableProps,
   ]);
 
-  return {
-    refresh: (toFirst?: boolean) => {
+  const refreshTable = useCallback<UseSearchTableResult<ValueType, ResExtra>['refresh']>(
+    async (toFirst?: boolean) => {
       if (toFirst) {
-        changeCurrent(1);
-        return;
+        return run({
+          pageNum: 1,
+        });
       }
 
-      void refresh();
+      return refresh();
     },
+    [refresh, run]
+  );
+
+  return {
+    refresh: refreshTable,
     run,
     mutate,
     error,

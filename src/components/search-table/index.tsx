@@ -5,6 +5,7 @@ import useSearchTable from './useSearchTable';
 export default SearchTable;
 export { useSearchTable, usePaginatedSearch };
 export type {
+  BaseSearchTableProps,
   ObjectType,
   PaginatedSearchProps,
   SearchTableProps,
@@ -12,4 +13,6 @@ export type {
   SearchTableRes,
   TableParams,
   UsePaginatedSearchResult,
+  UseSearchTableProps,
+  UseSearchTableResult,
 } from './interface';

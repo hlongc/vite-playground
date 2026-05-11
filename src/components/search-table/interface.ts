@@ -30,7 +30,7 @@ export interface SearchTableRes<ValueType, Extra = unknown> {
   extra?: Extra;
 }
 
-export interface SearchTableProps<
+export interface BaseSearchTableProps<
   ValueType extends ObjectType,
   Condition = unknown,
   ResExtra = unknown,
@@ -41,8 +41,6 @@ export interface SearchTableProps<
   ) => Promise<SearchTableRes<ValueType, ResExtra>>;
   /** 当前查询条件；变化后会参与下一次请求。 */
   conditions: Condition;
-  /** 为 true 时不自动请求，需手动调用 run / refresh。 */
-  manual?: boolean;
   /** 为 false 时禁止请求，常用于等待外部依赖准备完成。 */
   ready?: boolean;
   /** 是否默认用 Card 包一层表格；传 false 时只渲染表格本体。 */
@@ -54,12 +52,30 @@ export interface SearchTableProps<
   ) => void;
 }
 
+export interface SearchTableProps<
+  ValueType extends ObjectType,
+  Condition = unknown,
+  ResExtra = unknown,
+> extends BaseSearchTableProps<ValueType, Condition, ResExtra> {}
+
+export interface UseSearchTableProps<
+  ValueType extends ObjectType,
+  Condition = unknown,
+  ResExtra = unknown,
+> extends BaseSearchTableProps<ValueType, Condition, ResExtra> {
+  /**
+   * 为 true 时不自动请求，需手动调用 hook 返回值里的 run / refresh。
+   * 该能力只在 useSearchTable / usePaginatedSearch 模式下提供，SearchTable 组件不支持。
+   */
+  manual?: boolean;
+}
+
 export type PaginatedSearchProps<
   ValueType extends ObjectType,
   Condition = unknown,
   ResExtra = unknown,
 > = Pick<
-  SearchTableProps<ValueType, Condition, ResExtra>,
+  UseSearchTableProps<ValueType, Condition, ResExtra>,
   'requestMethod' | 'conditions' | 'manual' | 'ready' | 'pagination' | 'onError'
 >;
 
@@ -92,4 +108,39 @@ export interface UsePaginatedSearchResult<
   paginationProps: TablePaginationConfig;
   /** 独立渲染分页器，通常给非表格布局场景使用。 */
   renderPagination: () => ReactElement | null;
+}
+
+export interface UseSearchTableResult<
+  ValueType extends ObjectType,
+  ResExtra = unknown,
+> {
+  /** 最近一次成功请求返回的数据。 */
+  data?: SearchTableRes<ValueType, ResExtra>;
+  /** 最近一次请求失败时的错误对象。 */
+  error?: unknown;
+  /** 当前请求状态。 */
+  loading: boolean;
+  /** 主动发起请求，可覆写部分分页/排序参数。 */
+  run: (
+    tableParams?: Partial<TableParams>
+  ) => Promise<SearchTableRes<ValueType, ResExtra>>;
+  /**
+   * 刷新当前列表。
+   * 传 true 时会先跳回第一页，再发起请求。
+   */
+  refresh: (
+    toFirst?: boolean
+  ) => Promise<SearchTableRes<ValueType, ResExtra>>;
+  /** 在本地直接修改当前 records，适合做轻量乐观更新。 */
+  mutate: (
+    actuator?: (
+      records: SearchTableRes<ValueType, ResExtra>['records']
+    ) => SearchTableRes<ValueType, ResExtra>['records'] | void
+  ) => void;
+  /**
+   * 当前表格渲染结果。
+   * 这是 useSearchTable 和 SearchTable 组件的主要差异之一：
+   * hook 模式会把渲染结果交给页面自行放置，组件模式则直接返回它。
+   */
+  render: ReactElement;
 }
