@@ -88,7 +88,8 @@
     width 0.2s ease;
 }
 
-.resizableHeaderCell:hover .resizeHandle::after {
+.resizeHandle:hover::after,
+.resizeHandle:active::after {
   width: 3px;
   height: 24px;
   background: rgba(22, 119, 255, 0.78);
