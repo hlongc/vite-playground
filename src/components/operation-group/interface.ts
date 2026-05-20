@@ -37,6 +37,12 @@ export interface OperationGroupProps {
   size?: SpaceProps['size'];
   /** 透传给 antd Space 的 split。 */
   split?: ReactNode;
+  /**
+   * 是否启用紧凑模式。
+   * 默认 true，适合列表操作栏：会把组内 link 类型 Button 的横向 padding 置为 0。
+   * 传 false 时保留 antd Button 默认样式，适合 Card extra 等不需要压缩间距的场景。
+   */
+  compactMode?: boolean;
   /** 外层容器 className。 */
   className?: string;
   /** 外层容器 style。 */

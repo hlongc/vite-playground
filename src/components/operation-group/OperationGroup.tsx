@@ -86,6 +86,7 @@ export default function OperationGroup({
   moreText = "更多",
   size = 4,
   split,
+  compactMode = true,
   className,
   style,
   dropdownProps,
@@ -137,7 +138,10 @@ export default function OperationGroup({
   }
 
   return (
-    <div className={cs(styles.group, className)} style={style}>
+    <div
+      className={cs(styles.group, compactMode && styles.compact, className)}
+      style={style}
+    >
       <Space size={size} split={split}>
         {inlineItems.map((item) => (
           <Fragment key={item.key}>{item.node}</Fragment>
@@ -148,7 +152,12 @@ export default function OperationGroup({
             placement="bottomLeft"
             {...dropdownProps}
             dropdownRender={() => (
-              <div className={styles.dropdown}>
+              <div
+                className={cs(
+                  styles.dropdown,
+                  compactMode && styles.compactDropdown,
+                )}
+              >
                 <div className={styles.dropdownList}>
                   {overflowItems.map((item) => (
                     <div key={item.key} className={styles.dropdownItem}>
@@ -162,7 +171,7 @@ export default function OperationGroup({
             <Button
               type="link"
               {...moreButtonProps}
-              className={cs(styles.moreTrigger, moreButtonProps?.className)}
+              className={moreButtonProps?.className}
             >
               <span className={styles.moreText}>{moreText}</span>
             </Button>

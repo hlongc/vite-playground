@@ -48,6 +48,12 @@ const overridePermissionDemoCode = `<OperationGroup
   authList={['view', 'edit', 'delete', 'copy']}
   hasPermission={(authKey) => authKey !== 'copy'}
 />`;
+const nonCompactDemoCode = `<OperationGroup compactMode={false} max={3}>
+  <Button type="link">查看</Button>
+  <Button type="link">编辑</Button>
+  <Button danger type="link">删除</Button>
+  <Button type="link">复制</Button>
+</OperationGroup>`;
 
 const baseItems = (
   messageApi: ReturnType<typeof message.useMessage>[0],
@@ -197,7 +203,9 @@ export default function OperationGroupPage() {
             你可以直接在 <code>render</code> 里返回普通 <code>Button</code>、
             <code>Popconfirm</code> 包裹按钮，或者后面迁移真实权限逻辑时改成
             <code>authKey</code> 驱动。简单场景也支持直接传
-            <code>children</code>，不必额外写 <code>items</code>。
+            <code>children</code>，不必额外写 <code>items</code>。默认开启
+            <code>compactMode</code>，会压缩 link 按钮的横向 padding；放在
+            Card extra 等区域时可以传 <code>compactMode=false</code>。
           </Paragraph>
           <Space wrap>
             <Tag color="blue">max overflow</Tag>
@@ -276,6 +284,23 @@ export default function OperationGroupPage() {
                 authList={demoAuthList}
                 hasPermission={(authKey) => authKey !== "copy"}
               />
+            </Space>
+          </DemoBlock>
+
+          <DemoBlock
+            title="非紧凑模式"
+            description="在 Card extra 这类不需要节约横向空间的位置，可以关闭 compactMode，保留 antd link 按钮默认 padding。"
+            code={nonCompactDemoCode}
+          >
+            <Space direction="vertical" size={12} style={{ width: "100%" }}>
+              <OperationGroup compactMode={false} max={3}>
+                <Button type="link">查看</Button>
+                <Button type="link">编辑</Button>
+                <Button danger type="link">
+                  删除
+                </Button>
+                <Button type="link">复制</Button>
+              </OperationGroup>
             </Space>
           </DemoBlock>
         </Space>
