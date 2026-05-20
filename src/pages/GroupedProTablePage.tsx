@@ -1,12 +1,40 @@
 import { Card, Space, Tag, Typography } from 'antd';
 import { useMemo } from 'react';
 
+import DemoBlock from '../components/demo-block';
 import ProTable from '../components/pro-table';
 import type { ProTableProps } from '../components/pro-table';
 import ResultCard from './ResultCard';
 import styles from './Page.module.less';
 
 const { Paragraph } = Typography;
+const groupedTableCode = `const columns = [
+  {
+    title: '基础信息',
+    children: [
+      { title: '单据编号', dataIndex: 'code', width: 140 },
+      { title: '标题', dataIndex: 'title', width: 220, setting: { defaultSortIndex: 0 } },
+    ],
+  },
+  {
+    title: '业务信息',
+    children: [
+      { title: '负责人', dataIndex: 'owner', width: 120 },
+      { title: '归属部门', dataIndex: 'department', width: 160 },
+      { title: '金额', dataIndex: 'amount', width: 140, align: 'right' },
+    ],
+  },
+];
+
+<ProTable
+  uniqueKey="playground-grouped-pro-table"
+  rowKey="id"
+  serial={{ title: '序号', width: 72 }}
+  scroll={{ x: 1180 }}
+  columns={columns}
+  dataSource={groupedRows}
+  caption={{ setting: true }}
+/>`;
 
 interface GroupedRow {
   id: number;
@@ -141,7 +169,11 @@ export default function GroupedProTablePage() {
         </Space>
       </Card>
 
-      <Card className={styles.gridCard} title="分组表头列设置验证">
+      <DemoBlock
+        title="分组表头列设置验证"
+        description="setting 面板只处理叶子列，父分组列只作为结构容器；拖拽排序也只在同组叶子列内进行。"
+        code={groupedTableCode}
+      >
         <ProTable<GroupedRow>
           uniqueKey="playground-grouped-pro-table"
           rowKey="id"
@@ -153,7 +185,7 @@ export default function GroupedProTablePage() {
             setting: true,
           }}
         />
-      </Card>
+      </DemoBlock>
 
       <ResultCard
         title="当前分组列策略说明"

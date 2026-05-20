@@ -8,12 +8,46 @@ import {
   message,
 } from "antd";
 
+import DemoBlock from "../components/demo-block";
 import OperationGroup from "../components/operation-group";
 import type { OperationItem } from "../components/operation-group";
 import styles from "./Page.module.less";
 
 const { Paragraph, Text } = Typography;
 const demoAuthList = ['view', 'edit', 'delete', 'copy'];
+const childrenDemoCode = `<OperationGroup max={3}>
+  <Button type="link">查看</Button>
+  <Button type="link">编辑</Button>
+  <Button danger type="link">删除</Button>
+  <Button type="link">复制</Button>
+</OperationGroup>`;
+const baseItemsDemoCode = `const items = [
+  { key: 'view', authKey: 'view', render: <Button type="link">查看</Button> },
+  { key: 'edit', authKey: 'edit', render: <Button type="link">编辑</Button> },
+  { key: 'delete', authKey: 'delete', render: <Button danger type="link">删除</Button> },
+  { key: 'copy', authKey: 'copy', render: <Button type="link">复制</Button> },
+];
+
+<OperationGroup items={items} max={3} authList={['view', 'edit', 'delete', 'copy']} />`;
+const functionRenderDemoCode = `const items = [
+  { key: 'view', authKey: 'view', render: <Button type="link">查看</Button> },
+  {
+    key: 'custom',
+    hidden: true,
+    authKey: 'not-granted',
+    render: () => <Button type="link">函数 render 自己处理逻辑</Button>,
+  },
+  { key: 'delete', authKey: 'delete', render: <Button danger type="link">删除</Button> },
+  { key: 'copy', authKey: 'copy', render: <Button type="link">复制</Button> },
+];
+
+<OperationGroup items={items} max={3} split="|" />`;
+const overridePermissionDemoCode = `<OperationGroup
+  items={items}
+  max={4}
+  authList={['view', 'edit', 'delete', 'copy']}
+  hasPermission={(authKey) => authKey !== 'copy'}
+/>`;
 
 const baseItems = (
   messageApi: ReturnType<typeof message.useMessage>[0],
@@ -176,11 +210,12 @@ export default function OperationGroupPage() {
 
       <Card className={styles.gridCard} title="OperationGroup 编排示例">
         <Space direction="vertical" size={20} style={{ width: "100%" }}>
-          <Card title="极简 children 用法" className={styles.resultCard}>
+          <DemoBlock
+            title="极简 children 用法"
+            description="如果只是几个普通操作按钮，直接写 children 就行，不需要 items，也不需要手动补 key。"
+            code={childrenDemoCode}
+          >
             <Space direction="vertical" size={12} style={{ width: "100%" }}>
-              <Text type="secondary">
-                如果只是几个普通操作按钮，直接写 children 就行，不需要 items，也不需要手动补 key。
-              </Text>
               <OperationGroup max={3}>
                 <Button type="link">查看</Button>
                 <Button type="link">编辑</Button>
@@ -190,23 +225,24 @@ export default function OperationGroupPage() {
                 <Button type="link">复制</Button>
               </OperationGroup>
             </Space>
-          </Card>
+          </DemoBlock>
 
-          <Card title="基础收纳" className={styles.resultCard}>
+          <DemoBlock
+            title="基础收纳"
+            description="max=3，前两个常驻，后面的操作自动进入“更多”。"
+            code={baseItemsDemoCode}
+          >
             <Space direction="vertical" size={12} style={{ width: "100%" }}>
-              <Text type="secondary">
-                max=3，前两个常驻，后面的操作自动进入“更多”。
-              </Text>
               <OperationGroup items={baseItems(messageApi)} max={3} authList={demoAuthList} />
             </Space>
-          </Card>
+          </DemoBlock>
 
-          <Card title="权限和隐藏过滤" className={styles.resultCard}>
+          <DemoBlock
+            title="权限和隐藏过滤"
+            description="元素 render 会先走 hidden/authKey 过滤；这页 demo 传入的 authList 里不包含 archive。"
+            code={baseItemsDemoCode}
+          >
             <Space direction="vertical" size={8}>
-              <Text type="secondary">
-                元素 render 会先走 hidden/authKey 过滤；这页 demo 传入的 authList
-                里不包含 archive。
-              </Text>
               <OperationGroup
                 items={permissionFilteredItems}
                 max={3}
@@ -216,24 +252,24 @@ export default function OperationGroupPage() {
                 当前 demo authList：view、edit、delete、copy
               </Text>
             </Space>
-          </Card>
+          </DemoBlock>
 
-          <Card title="函数 render 自处理" className={styles.resultCard}>
+          <DemoBlock
+            title="函数 render 自处理"
+            description="当 render 是函数时，OperationGroup 不再处理 hidden 和 authKey，默认交给函数内部自行决定。"
+            code={functionRenderDemoCode}
+          >
             <Space direction="vertical" size={12} style={{ width: "100%" }}>
-              <Text type="secondary">
-                当 render 是函数时，OperationGroup 不再处理 hidden 和
-                authKey，默认交给函数内部自行决定。
-              </Text>
               <OperationGroup items={functionRenderItems} max={3} split="|" />
             </Space>
-          </Card>
+          </DemoBlock>
 
-          <Card title="自定义权限判断" className={styles.resultCard}>
+          <DemoBlock
+            title="自定义权限判断"
+            description="外部可以传 hasPermission 覆盖默认权限逻辑，方便后面接你们真实权限体系。"
+            code={overridePermissionDemoCode}
+          >
             <Space direction="vertical" size={12} style={{ width: "100%" }}>
-              <Text type="secondary">
-                外部可以传 hasPermission 覆盖内置 mock
-                逻辑，方便后面接你们真实权限体系。
-              </Text>
               <OperationGroup
                 items={permissionFilteredItems}
                 max={4}
@@ -241,7 +277,7 @@ export default function OperationGroupPage() {
                 hasPermission={(authKey) => authKey !== "copy"}
               />
             </Space>
-          </Card>
+          </DemoBlock>
         </Space>
       </Card>
     </div>

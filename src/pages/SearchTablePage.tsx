@@ -1,6 +1,7 @@
 import { Card, Input, Select, Space, Tag, Typography } from "antd";
 import { useCallback, useMemo, useState } from "react";
 
+import DemoBlock from "../components/demo-block";
 import SearchFormV2 from "../components/search-form-v2";
 import SearchTable from "../components/search-table";
 import type {
@@ -12,6 +13,26 @@ import ResultCard from "./ResultCard";
 import styles from "./Page.module.less";
 
 const { Paragraph } = Typography;
+const searchTableDemoCode = `const [conditions, setConditions] = useState({});
+
+<SearchFormV2
+  onSearch={(value) => setConditions(value)}
+  onReset={(value) => setConditions(value)}
+  items={[
+    { label: '关键字', name: 'keyword', value: <Input allowClear placeholder="搜标题关键字" /> },
+    { label: '状态', name: 'status', value: <Select allowClear placeholder="全部状态" /> },
+  ]}
+/>
+
+<SearchTable
+  uniqueKey="playground-search-table"
+  rowKey="id"
+  requestMethod={requestMethod}
+  conditions={conditions}
+  columns={columns}
+  pagination={{ defaultCurrent: 1, defaultPageSize: 5 }}
+  caption={{ setting: true }}
+/>`;
 
 interface SearchRow {
   id: number;
@@ -256,83 +277,91 @@ export default function SearchTablePage() {
         </Space>
       </Card>
 
-      <SearchFormV2
-        onSearch={(value) => setConditions(value as SearchConditions)}
-        onReset={(value) => setConditions(value as SearchConditions)}
-        labelWidth={88}
-        items={[
-          {
-            label: "关键字",
-            name: "keyword",
-            value: <Input allowClear placeholder="搜标题关键字" />,
-          },
-          {
-            label: "状态",
-            name: "status",
-            value: (
-              <Select
-                allowClear
-                placeholder="全部状态"
-                options={[
-                  { label: "草稿", value: "draft" },
-                  { label: "进行中", value: "running" },
-                  { label: "已完成", value: "done" },
-                ]}
-              />
-            ),
-          },
-          {
-            label: "负责人",
-            name: "owner",
-            value: (
-              <Select
-                allowClear
-                placeholder="全部负责人"
-                options={[
-                  { label: "林峰", value: "林峰" },
-                  { label: "周宁", value: "周宁" },
-                  { label: "陈默", value: "陈默" },
-                  { label: "叶青", value: "叶青" },
-                  { label: "宋然", value: "宋然" },
-                ]}
-              />
-            ),
-          },
-          {
-            label: "分类",
-            name: "category",
-            value: (
-              <Select
-                allowClear
-                placeholder="全部分类"
-                options={[
-                  { label: "采购", value: "采购" },
-                  { label: "供应商", value: "供应商" },
-                  { label: "履约", value: "履约" },
-                  { label: "财务", value: "财务" },
-                  { label: "法务", value: "法务" },
-                ]}
-              />
-            ),
-          },
-        ]}
-      />
+      <DemoBlock
+        title="查询表格联动"
+        description="这是 SearchFormV2 和 SearchTable 的典型联动写法：表单负责更新 conditions，SearchTable 负责请求、分页和排序。"
+        code={searchTableDemoCode}
+      >
+        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <SearchFormV2
+            onSearch={(value) => setConditions(value as SearchConditions)}
+            onReset={(value) => setConditions(value as SearchConditions)}
+            labelWidth={88}
+            items={[
+              {
+                label: "关键字",
+                name: "keyword",
+                value: <Input allowClear placeholder="搜标题关键字" />,
+              },
+              {
+                label: "状态",
+                name: "status",
+                value: (
+                  <Select
+                    allowClear
+                    placeholder="全部状态"
+                    options={[
+                      { label: "草稿", value: "draft" },
+                      { label: "进行中", value: "running" },
+                      { label: "已完成", value: "done" },
+                    ]}
+                  />
+                ),
+              },
+              {
+                label: "负责人",
+                name: "owner",
+                value: (
+                  <Select
+                    allowClear
+                    placeholder="全部负责人"
+                    options={[
+                      { label: "林峰", value: "林峰" },
+                      { label: "周宁", value: "周宁" },
+                      { label: "陈默", value: "陈默" },
+                      { label: "叶青", value: "叶青" },
+                      { label: "宋然", value: "宋然" },
+                    ]}
+                  />
+                ),
+              },
+              {
+                label: "分类",
+                name: "category",
+                value: (
+                  <Select
+                    allowClear
+                    placeholder="全部分类"
+                    options={[
+                      { label: "采购", value: "采购" },
+                      { label: "供应商", value: "供应商" },
+                      { label: "履约", value: "履约" },
+                      { label: "财务", value: "财务" },
+                      { label: "法务", value: "法务" },
+                    ]}
+                  />
+                ),
+              },
+            ]}
+          />
 
-      <SearchTable<SearchRow, SearchConditions>
-        uniqueKey="playground-search-table"
-        rowKey="id"
-        requestMethod={requestMethod}
-        conditions={conditions}
-        columns={columns}
-        pagination={{
-          defaultCurrent: 1,
-          defaultPageSize: 5,
-        }}
-        caption={{
-          setting: true,
-          actions: [],
-        }}
-      />
+          <SearchTable<SearchRow, SearchConditions>
+            uniqueKey="playground-search-table"
+            rowKey="id"
+            requestMethod={requestMethod}
+            conditions={conditions}
+            columns={columns}
+            pagination={{
+              defaultCurrent: 1,
+              defaultPageSize: 5,
+            }}
+            caption={{
+              setting: true,
+              actions: [],
+            }}
+          />
+        </Space>
+      </DemoBlock>
 
       <ResultCard title="最近一次搜索条件" value={conditions} />
     </div>

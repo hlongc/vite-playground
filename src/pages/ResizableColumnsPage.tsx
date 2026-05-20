@@ -1,11 +1,35 @@
 import { Card, Space, Tag, Typography } from 'antd';
 import { useMemo } from 'react';
 
+import DemoBlock from '../components/demo-block';
 import ProTable from '../components/pro-table';
 import type { ProTableProps } from '../components/pro-table';
 import styles from './Page.module.less';
 
 const { Paragraph } = Typography;
+const disabledResizeCode = `<ProTable
+  uniqueKey="playground-resizable-disabled"
+  rowKey="id"
+  columnResizable={false}
+  scroll={{ x: 1080 }}
+  columns={baseColumns}
+  dataSource={rows}
+  caption={{ setting: true }}
+/>`;
+const partialResizeCode = `<ProTable
+  uniqueKey="playground-resizable-partial-locked"
+  rowKey="id"
+  columnResizable
+  scroll={{ x: 1080 }}
+  columns={[
+    { title: '单据编号', dataIndex: 'code', width: 140 },
+    { title: '标题', dataIndex: 'title', width: 220, resizable: false },
+    { title: '负责人', dataIndex: 'owner', width: 120 },
+    { title: '归属部门', dataIndex: 'department', width: 160, resizable: false },
+  ]}
+  dataSource={rows}
+  caption={{ setting: true }}
+/>`;
 
 interface ResizableRow {
   id: number;
@@ -136,7 +160,11 @@ export default function ResizableColumnsPage() {
         </Space>
       </Card>
 
-      <Card className={styles.gridCard} title="整表关闭拖宽">
+      <DemoBlock
+        title="整表关闭拖宽"
+        description="通过 columnResizable={false} 关闭当前表格的列宽拖拽能力。"
+        code={disabledResizeCode}
+      >
         <ProTable<ResizableRow>
           uniqueKey="playground-resizable-disabled"
           rowKey="id"
@@ -148,9 +176,13 @@ export default function ResizableColumnsPage() {
             setting: true,
           }}
         />
-      </Card>
+      </DemoBlock>
 
-      <Card className={styles.gridCard} title="局部列禁用拖宽">
+      <DemoBlock
+        title="局部列禁用拖宽"
+        description="整表开启拖宽时，仍然可以通过列级 resizable: false 单独锁定某些列。"
+        code={partialResizeCode}
+      >
         <ProTable<ResizableRow>
           uniqueKey="playground-resizable-partial-locked"
           rowKey="id"
@@ -162,7 +194,7 @@ export default function ResizableColumnsPage() {
             setting: true,
           }}
         />
-      </Card>
+      </DemoBlock>
     </div>
   );
 }
